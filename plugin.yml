@@ -1,0 +1,63 @@
+name: SimpleModerator
+main: com.bukkit.tj007razor.simplemod.SimpleMod
+version: 0.1
+website: http://minecraftservers.net/bukkit
+author: tj007razor
+commands:
+    simplemoderator:
+        aliases:
+            - sa
+            - sm
+            - simplemod
+        description: Displays SimpleMod help
+        usage: |
+            /<command> | Displays SimpleMod help
+    ban:
+        permission:
+            - simplemod.ban
+            - simplemod.ban.temp
+        aliases:
+        description: Ban a player
+        usage: |
+            /<command> <name> | Bans player with the given name
+            /<command> <name> <hours> | Bans player for given # of hours
+    banip:
+        permissions:
+            - simplemod.ipban
+        aliases:
+            - ipban
+            - iban
+        description: Bans supplied player's IP address
+        usage:
+            /<command> <name> | Bans supplied player's IP address
+    unban:
+        permission:
+            - simplemod.unban
+        aliases:
+            - uban
+        description: Unban a player
+        usage: |
+            /<command> <name> | Unbans player with the given name if they are banned
+    mute:
+        permission:
+            - simplemod.mute
+            - simplemod.mute.temp
+        aliases:
+        description: Mute a player
+        usage: |
+            /<command> <name> | Mutes player with the given name
+            /<command> <name> <hours> | Mutes player for given # of hours
+    unmute:
+        permission:
+            - simplemod.unmute
+        aliases:
+            - umute
+        description: Unmute a player
+        usage: |
+            /<command> <name> | Unmutes player with given name
+    kick:
+        permission:
+            - simplemod.kick
+        description: Kick a player
+        usage: |
+            /<command> <name> | Kicks player with given name
