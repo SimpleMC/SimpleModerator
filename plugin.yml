@@ -1,7 +1,7 @@
 name: SimpleModerator
-main: com.bukkit.tj007razor.simplemod.SimpleMod
-version: 0.1
-website: http://minecraftservers.net/bukkit
+main: com.evosysdev.bukkit.taylorjb.simplemod.SimpleMod
+version: 0.3
+website: http://dev.bukkit.org/server-mods/simplemoderator/
 author: tj007razor
 commands:
     simplemoderator:
