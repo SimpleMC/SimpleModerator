@@ -2,7 +2,7 @@ name: SimpleModerator
 main: com.evosysdev.bukkit.taylorjb.simplemod.SimpleMod
 version: 0.3.1
 website: http://dev.bukkit.org/server-mods/simplemoderator/
-author: tj007razor
+author: taylorjb
 permissions:
     simplemod:
         description: Gives access to SimpleModerator help command
