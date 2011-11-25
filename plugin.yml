@@ -1,8 +1,27 @@
 name: SimpleModerator
 main: com.evosysdev.bukkit.taylorjb.simplemod.SimpleMod
-version: 0.3
+version: 0.3.1
 website: http://dev.bukkit.org/server-mods/simplemoderator/
 author: tj007razor
+permissions:
+    simplemod:
+        description: Gives access to SimpleModerator help command
+    simplemod.ban:
+        description: Allows you to ban a user
+    simplemod.ban.temp:
+        description: Allows you to temporarily ban a user
+    simplemod.ipban:
+        description: Allows you to IP ban a user
+    simplemod.unban:
+        description: Allows you to unban a user
+    simplemod.mute:
+        description: Allows you to mute a user
+    simplemod.mute.temp:
+        description: Allows you to temporarily mute a user
+    simplemod.unmute:
+        description: Allows you to unmute a user
+    simplemod.kick:
+        description: Allows you to kick a user
 commands:
     simplemoderator:
         aliases:
@@ -13,17 +32,12 @@ commands:
         usage: |
             /<command> | Displays SimpleMod help
     ban:
-        permission:
-            - simplemod.ban
-            - simplemod.ban.temp
         aliases:
         description: Ban a player
         usage: |
             /<command> <name> | Bans player with the given name
             /<command> <name> <hours> | Bans player for given # of hours
     banip:
-        permissions:
-            - simplemod.ipban
         aliases:
             - ipban
             - iban
@@ -31,33 +45,24 @@ commands:
         usage:
             /<command> <name> | Bans supplied player's IP address
     unban:
-        permission:
-            - simplemod.unban
         aliases:
             - uban
         description: Unban a player
         usage: |
             /<command> <name> | Unbans player with the given name if they are banned
     mute:
-        permission:
-            - simplemod.mute
-            - simplemod.mute.temp
         aliases:
         description: Mute a player
         usage: |
             /<command> <name> | Mutes player with the given name
             /<command> <name> <hours> | Mutes player for given # of hours
     unmute:
-        permission:
-            - simplemod.unmute
         aliases:
             - umute
         description: Unmute a player
         usage: |
             /<command> <name> | Unmutes player with given name
     kick:
-        permission:
-            - simplemod.kick
         description: Kick a player
         usage: |
             /<command> <name> | Kicks player with given name

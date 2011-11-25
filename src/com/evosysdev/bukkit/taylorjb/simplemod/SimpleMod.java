@@ -8,19 +8,14 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import com.nijiko.permissions.PermissionHandler;
-import com.nijikokun.bukkit.Permissions.Permissions;
 
 public class SimpleMod extends JavaPlugin
 {
     // create our listeners
     private final SimpleModPlayerListener playerListener = new SimpleModPlayerListener(this);
-
-    private PermissionHandler permissions; // Permissions handler
+    
     private SimpleModHandler smHandler; // our moderation action handler
 
     /**
@@ -30,13 +25,6 @@ public class SimpleMod extends JavaPlugin
     {
         PluginManager pm = getServer().getPluginManager();
         smHandler = new SimpleModHandler();
-
-        // if setting up Permissions fails, disable
-        if (!setupPermissions())
-        {
-            pm.disablePlugin(this);
-            return;
-        }
 
         // register our events
         pm.registerEvent(Event.Type.PLAYER_LOGIN, playerListener, Priority.High, this);
@@ -52,39 +40,41 @@ public class SimpleMod extends JavaPlugin
         // help command
         if (command.getName().equalsIgnoreCase("simplemoderator"))
         {
-            if (permissions.has(player, "simplemod"))
+            // show help for only commands user has access to
+            // this seems like a silly way to do it.
+            if (sender.hasPermission("simplemod"))
             {
-                if (permissions.has(player, "simplemod.ban") || permissions.has(player, "simplemod.ban.temp"))
+                if (sender.hasPermission("simplemod.ban") || sender.hasPermission("simplemod.ban.temp"))
                 {
                     sender.sendMessage(ChatColor.AQUA + "/" + getCommand("ban").getName() + ChatColor.WHITE + " | " + ChatColor.BLUE
                             + getCommand("ban").getDescription());
                 }
 
-                if (permissions.has(player, "simplemod.ipban"))
+                if (sender.hasPermission("simplemod.ipban"))
                 {
                     sender.sendMessage(ChatColor.AQUA + "/" + getCommand("banip").getName() + ChatColor.WHITE + " | " + ChatColor.BLUE
                             + getCommand("banip").getDescription());
                 }
 
-                if (permissions.has(player, "simplemod.unban"))
+                if (sender.hasPermission("simplemod.unban"))
                 {
                     sender.sendMessage(ChatColor.AQUA + "/" + getCommand("unban").getName() + ChatColor.WHITE + " | " + ChatColor.BLUE
                             + getCommand("unban").getDescription());
                 }
 
-                if (permissions.has(player, "simplemod.mute") || permissions.has(player, "simplemod.mute.temp"))
+                if (sender.hasPermission("simplemod.mute") || sender.hasPermission("simplemod.mute.temp"))
                 {
                     sender.sendMessage(ChatColor.AQUA + "/" + getCommand("mute").getName() + ChatColor.WHITE + " | " + ChatColor.BLUE
                             + getCommand("mute").getDescription());
                 }
 
-                if (permissions.has(player, "simplemod.unmute"))
+                if (sender.hasPermission("simplemod.unmute"))
                 {
                     sender.sendMessage(ChatColor.AQUA + "/" + getCommand("unmute").getName() + ChatColor.WHITE + " | " + ChatColor.BLUE
                             + getCommand("unmute").getDescription());
                 }
 
-                if (permissions.has(player, "simplemod.kick"))
+                if (sender.hasPermission("simplemod.kick"))
                 {
                     sender.sendMessage(ChatColor.AQUA + "/" + getCommand("kick").getName() + ChatColor.WHITE + " | " + ChatColor.BLUE
                             + getCommand("kick").getDescription());
@@ -97,7 +87,7 @@ public class SimpleMod extends JavaPlugin
         }
         else if (command.getName().equalsIgnoreCase("ban"))
         {
-            if (permissions.has(player, "simplemod.ban") || permissions.has(player, "simplemod.ban.temp"))
+            if (sender.hasPermission("simplemod.ban") || sender.hasPermission("simplemod.ban.temp"))
             {
                 // if there are actual args
                 if (args.length > 0)
@@ -128,7 +118,7 @@ public class SimpleMod extends JavaPlugin
                     else
                     {
                         // check for perm ban permissions
-                        if (permissions.has(player, "simplemod.ban"))
+                        if (sender.hasPermission("simplemod.ban"))
                         {
                             smHandler.ban(playerName);
                             sender.sendMessage(ChatColor.GREEN + "Player '" + playerName + "' successfully banned!");
@@ -151,7 +141,7 @@ public class SimpleMod extends JavaPlugin
         }
         else if (command.getName().equalsIgnoreCase("banip"))
         {
-            if (permissions.has(player, "simplemod.ipban"))
+            if (sender.hasPermission("simplemod.ipban"))
             {
                 if (args.length > 0)
                 {
@@ -181,7 +171,7 @@ public class SimpleMod extends JavaPlugin
         }
         else if (command.getName().equalsIgnoreCase("unban"))
         {
-            if (permissions.has(player, "simplemod.unban"))
+            if (sender.hasPermission("simplemod.unban"))
             {
                 if (args.length > 0)
                 {
@@ -206,7 +196,7 @@ public class SimpleMod extends JavaPlugin
         }
         else if (command.getName().equalsIgnoreCase("mute"))
         {
-            if (permissions.has(player, "simplemod.mute") || permissions.has(player, "simplemod.mute.temp"))
+            if (sender.hasPermission("simplemod.mute") || sender.hasPermission("simplemod.mute.temp"))
             {
                 // if there are actual args
                 if (args.length > 0)
@@ -232,7 +222,7 @@ public class SimpleMod extends JavaPlugin
                     else
                     {
                         // check for perm mute permissions
-                        if (permissions.has(player, "simplemod.mute"))
+                        if (sender.hasPermission("simplemod.mute"))
                         {
                             smHandler.mute(playerName);
                             sender.sendMessage(ChatColor.GREEN + "Player '" + playerName + "' successfully muted!");
@@ -255,7 +245,7 @@ public class SimpleMod extends JavaPlugin
         }
         else if (command.getName().equalsIgnoreCase("unmute"))
         {
-            if (permissions.has(player, "simplemod.unmute"))
+            if (sender.hasPermission("simplemod.unmute"))
             {
                 if (args.length > 0)
                 {
@@ -280,7 +270,7 @@ public class SimpleMod extends JavaPlugin
         }
         else if (command.getName().equalsIgnoreCase("kick"))
         {
-            if (permissions.has(player, "simplemod.kick"))
+            if (sender.hasPermission("simplemod.kick"))
             {
                 if (args.length > 0)
                 {
@@ -317,41 +307,6 @@ public class SimpleMod extends JavaPlugin
     public void onDisable()
     {
         Logger.getLogger("Minecraft").info("SimpleModerator disabled.");
-    }
-
-    /**
-     * Set up the permissions handler
-     * 
-     * @return if the Permissions are set up correctly
-     */
-    private boolean setupPermissions()
-    {
-        Plugin test = this.getServer().getPluginManager().getPlugin("Permissions");
-
-        if (this.permissions == null)
-        {
-            if (test != null)
-            {
-                this.permissions = ((Permissions) test).getHandler();
-                return true;
-            }
-            else
-            {
-                Logger.getLogger("Minecraft").info("Permission system not detected, disabling SimpleModerator.");
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Get the permissions handler
-     * 
-     * @return the permissions handler
-     */
-    public PermissionHandler getPermissions()
-    {
-        return permissions;
     }
 
     /**
