@@ -1,7 +1,10 @@
 package com.evosysdev.bukkit.taylorjb.simplemod;
 
+import java.util.logging.Logger;
+
 import org.bukkit.ChatColor;
 import org.bukkit.event.player.PlayerChatEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
@@ -9,7 +12,7 @@ import org.bukkit.event.player.PlayerLoginEvent.Result;
 public class SimpleModPlayerListener extends PlayerListener
 {
     private SimpleMod plugin; // instance of our plugin
-
+    
     /**
      * Initialize our listener
      * 
@@ -20,9 +23,10 @@ public class SimpleModPlayerListener extends PlayerListener
     {
         this.plugin = plugin;
     }
-
+    
     /**
      * Listen to player logins/login event
+     * Check if user is banned
      * 
      * @param login
      *            login event
@@ -30,12 +34,30 @@ public class SimpleModPlayerListener extends PlayerListener
     @Override
     public void onPlayerLogin(PlayerLoginEvent login)
     {
-        if (plugin.getHandler().isBanned(login.getPlayer().getName(), login.getPlayer().getAddress()))
+        if (this.plugin.getHandler().isBanned(login.getPlayer().getName()))
         {
-            login.disallow(Result.KICK_BANNED, "You are banned!");
+            login.disallow(PlayerLoginEvent.Result.KICK_BANNED, "You are banned!");
+            Logger.getLogger("minecraft").info("Player " + login.getPlayer().getName() + " denied entry: banned");
         }
     }
-
+    
+    /**
+     * Listen to player join event
+     * See if user should be IP banned
+     * 
+     * @param join
+     *            join event
+     */
+    @Override
+    public void onPlayerJoin(PlayerJoinEvent join)
+    {
+        if (this.plugin.getHandler().isBanned(join.getPlayer().getName(), join.getPlayer().getAddress().getAddress().getHostAddress()))
+        {
+            join.getPlayer().kickPlayer("You are banned!");
+            Logger.getLogger("minecraft").info("Player " + join.getPlayer().getName() + " denied entry: banned");
+        }
+    }
+    
     /**
      * Listen to chat/chat event
      * 

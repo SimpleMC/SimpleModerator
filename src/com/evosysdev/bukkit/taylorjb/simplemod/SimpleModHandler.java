@@ -1,6 +1,7 @@
 package com.evosysdev.bukkit.taylorjb.simplemod;
 
 import java.net.InetSocketAddress;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,19 +17,22 @@ public class SimpleModHandler
 {
     private Map<String, Long> bans, // currently banned players
             mutes; // currently muted players
-    
     private List<String> ipBans; // currently banned IP addresses
-
+    private SimpleMod instance; // instance of SimpleMod
+    private boolean persistMutes; // should mutes persist through logout
+    
     /**
      * Initialize the handler
+     * 
+     * @param instance
+     *            instance of plugin
      */
-    public SimpleModHandler()
+    public SimpleModHandler(SimpleMod instance)
     {
-        bans = new HashMap<String, Long>();
-        ipBans = new LinkedList<String>();
-        mutes = new HashMap<String, Long>();
+        this.instance = instance;
+        load();
     }
-
+    
     /**
      * Perm ban player
      * 
@@ -38,8 +42,9 @@ public class SimpleModHandler
     public void ban(String player)
     {
         bans.put(player.toLowerCase(), new Long(-1));
+        save("bans", bansString());
     }
-
+    
     /**
      * Ban player for hours
      * 
@@ -51,8 +56,9 @@ public class SimpleModHandler
     public void ban(String player, int hours)
     {
         bans.put(player.toLowerCase(), System.currentTimeMillis() + (hours * 1000 * 60 * 60));
+        save("bans", bansString());
     }
-
+    
     /**
      * Unban player
      * 
@@ -65,11 +71,27 @@ public class SimpleModHandler
         player = player.toLowerCase();
         
         // no ban to remove
-        if (!isBanned(player)) return false;
-
+        if (!isBanned(player))
+            return false;
+        
         // remove and success
         bans.remove(player);
+        save("bans", bansString());
         return true;
+    }
+    
+    /**
+     * @return string representation of bans in format for file
+     */
+    public String bansString()
+    {
+        String banString = "";
+        for (String player : this.bans.keySet())
+        {
+            banString = banString + player + ':' + this.bans.get(player) + ',';
+        }
+        
+        return banString;
     }
     
     /**
@@ -81,8 +103,23 @@ public class SimpleModHandler
     public void banIP(String host)
     {
         ipBans.add(host);
+        save("ipbans", ipbansString());
     }
-
+    
+    /**
+     * @return String representation of IP bans
+     */
+    public String ipbansString()
+    {
+        String ipbanString = "";
+        for (String player : this.ipBans)
+        {
+            ipbanString = ipbanString + player + ',';
+        }
+        
+        return ipbanString;
+    }
+    
     /**
      * Check if a player is banned
      * 
@@ -90,23 +127,25 @@ public class SimpleModHandler
      *            player to check ban status of
      * @return if player is banned or not
      */
-    private boolean isBanned(String player)
+    public boolean isBanned(String player)
     {
         player = player.toLowerCase();
         
-        // make sure there is a ban
-        if (bans.containsKey(player))
+        // if player is in ban list, ensure we shouldn't be unbanning them
+        if (this.bans.containsKey(player))
         {
-            // ban is expired, remove it
-            if (bans.get(player) > System.currentTimeMillis())
+            // ban expired
+            if ((((Long) this.bans.get(player)).longValue() != -1L) && (((Long) this.bans.get(player)).longValue() < System.currentTimeMillis()))
             {
-                bans.remove(player);
+                this.bans.remove(player);
+                save("bans", bansString());
             }
             else
+            {
                 return true;
+            }
         }
-
-        // not banned
+        
         return false;
     }
     
@@ -115,30 +154,31 @@ public class SimpleModHandler
      * 
      * @param player
      *            player to check ban status of
-     * @param inetSocketAddress.getHostString()
+     * @param hostname
      *            host to check
      * @return if player is banned or not
      */
-    public boolean isBanned(String player, InetSocketAddress inetSocketAddress)
+    public boolean isBanned(String player, String hostString)
     {
         player = player.toLowerCase();
         
-        // make sure there is a ban
-        if (bans.containsKey(player) || (inetSocketAddress!= null && ipBans.contains(inetSocketAddress.getHostString())))
+        if ((this.bans.containsKey(player)) || (this.ipBans.contains(hostString)))
         {
-            // ban is expired, remove it
-            if (bans.containsKey(player) && bans.get(player) > System.currentTimeMillis())
+            if ((this.bans.get(player) != null) && (((Long) this.bans.get(player)).longValue() != -1L) && (this.bans.containsKey(player))
+                    && (((Long) this.bans.get(player)).longValue() < System.currentTimeMillis()))
             {
-                bans.remove(player);
+                this.bans.remove(player);
+                save("bans", bansString());
             }
             else
+            {
                 return true;
+            }
         }
-
-        // not banned
+        
         return false;
     }
-
+    
     /**
      * Perm mute player
      * 
@@ -148,8 +188,11 @@ public class SimpleModHandler
     public void mute(String player)
     {
         mutes.put(player.toLowerCase(), new Long(-1));
+        
+        if (this.persistMutes)
+            save("mutes", mutesString());
     }
-
+    
     /**
      * Mute player for time
      * 
@@ -161,8 +204,11 @@ public class SimpleModHandler
     public void mute(String player, int hours)
     {
         mutes.put(player.toLowerCase(), System.currentTimeMillis() + (hours * 1000 * 60 * 60));
+        
+        if (this.persistMutes)
+            save("mutes", mutesString());
     }
-
+    
     /**
      * Unmute player
      * 
@@ -175,13 +221,29 @@ public class SimpleModHandler
         player = player.toLowerCase();
         
         // no mute to remove
-        if (!isMuted(player)) return false;
-
+        if (!isMuted(player))
+            return false;
+        
         // remove and success
         mutes.remove(player);
+        save("mutes", mutesString());
         return true;
     }
-
+    
+    /**
+     * @return String representation of mutes
+     */
+    public String mutesString()
+    {
+        String muteString = "";
+        for (String player : this.mutes.keySet())
+        {
+            muteString = muteString + player + ':' + this.mutes.get(player) + ',';
+        }
+        
+        return muteString;
+    }
+    
     /**
      * Check if a player is muted
      * 
@@ -193,19 +255,97 @@ public class SimpleModHandler
     {
         player = player.toLowerCase();
         
-        // make sure there is a mute
-        if (mutes.containsKey(player))
+        if (this.mutes.containsKey(player))
         {
-            // mute is expired, remove it
-            if (mutes.get(player) > System.currentTimeMillis())
+            if ((((Long) this.mutes.get(player)).longValue() != -1L) && (((Long) this.mutes.get(player)).longValue() < System.currentTimeMillis()))
             {
-                mutes.remove(player);
+                this.mutes.remove(player);
+                save("mutes", mutesString());
             }
             else
+            {
                 return true;
+            }
         }
-
-        // not muted
+        
         return false;
+    }
+    
+    /**
+     * Load data from the plugin's config file
+     * 
+     * If it doesn't exist, generate defaults
+     */
+    public void load()
+    {
+        bans = new HashMap<String, Long>();
+        ipBans = new LinkedList<String>();
+        mutes = new HashMap<String, Long>();
+        persistMutes = false;
+        
+        try
+        {
+            // load bans
+            String banString = instance.getConfig().getString("bans");
+            if (banString.length() > 0)
+                decodeList(bans, banString.split(","));
+            
+            // load IP bans
+            String ipBanString = instance.getConfig().getString("ipbans");
+            if (ipBanString.length() > 0)
+                ipBans.addAll(Arrays.asList(ipBanString.split(",")));
+            
+            // load setting to persist mutes through sessions or not
+            persistMutes = instance.getConfig().getBoolean("persist-mutes", false);
+            
+            // if we are persisting mutes, load pre-existing ones
+            if (persistMutes)
+            {
+                String muteString = instance.getConfig().getString("mutes");
+                if (muteString.length() > 0)
+                    decodeList(this.mutes, muteString.split(","));
+            }
+        }
+        catch (NullPointerException npe)
+        { // config file couldn't be read
+            instance.getConfig().set("bans", "");
+            instance.getConfig().set("mutes", "");
+            instance.getConfig().set("persist-mutes", "false");
+            instance.getConfig().set("ipbans", "");
+            instance.saveConfig();
+        }
+    }
+    
+    /**
+     * Decode list of string:long format into a map of the same
+     * Is there an easier way to do this?
+     * 
+     * @param map
+     * @param list
+     */
+    public void decodeList(Map<String, Long> map, String[] list)
+    {
+        if (list.length > 0)
+        {
+            for (String s : list)
+            {
+                String[] split = s.split(":");
+                map.put(split[0], Long.valueOf(split[1]));
+            }
+        }
+    }
+    
+    /**
+     * Save data to config file
+     * 
+     * @param node
+     *            node to change/set/save
+     * @param data
+     *            data we are writing to the node
+     */
+    private void save(String node, String data)
+    {
+        instance.getConfig().set(node, data);
+        instance.saveConfig();
     }
 }

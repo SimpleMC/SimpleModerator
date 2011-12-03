@@ -24,11 +24,12 @@ public class SimpleMod extends JavaPlugin
     public void onEnable()
     {
         PluginManager pm = getServer().getPluginManager();
-        smHandler = new SimpleModHandler();
+        smHandler = new SimpleModHandler(this);
 
         // register our events
         pm.registerEvent(Event.Type.PLAYER_LOGIN, playerListener, Priority.High, this);
         pm.registerEvent(Event.Type.PLAYER_CHAT, playerListener, Priority.High, this);
+        pm.registerEvent(Event.Type.PLAYER_JOIN, this.playerListener, Event.Priority.High, this);
         System.out.println(getDescription().getName() + " version " + getDescription().getVersion() + " enabled!");
     }
 
@@ -122,6 +123,11 @@ public class SimpleMod extends JavaPlugin
                         {
                             smHandler.ban(playerName);
                             sender.sendMessage(ChatColor.GREEN + "Player '" + playerName + "' successfully banned!");
+                            
+                            // if player is online, kick them
+                            Player banning = getServer().getPlayer(playerName);
+                            if (banning != null) banning.kickPlayer("You have been banned!");
+                            
                             Logger.getLogger("minecraft").info(player.getName() + " banned player " + playerName);
                         }
                         else
