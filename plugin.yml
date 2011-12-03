@@ -1,11 +1,23 @@
 name: SimpleModerator
 main: com.evosysdev.bukkit.taylorjb.simplemod.SimpleMod
-version: 0.3.1
+version: 0.3.5
 website: http://dev.bukkit.org/server-mods/simplemoderator/
 author: taylorjb
 permissions:
     simplemod:
         description: Gives access to SimpleModerator help command
+    simplemod.*:
+        description: Gives access to all SimpleMod commands
+        children:
+            simplemod: true
+            simplemod.ban: true
+            simplemod.ban.temp: true
+            simplemod.ipban: true
+            simplemod.unban: true
+            simplemod.mute: true
+            simplemod.mute.temp: true
+            simplemod.unmute: true
+            simplemod.kick: true
     simplemod.ban:
         description: Allows you to ban a user
     simplemod.ban.temp:

@@ -36,8 +36,6 @@ public class SimpleMod extends JavaPlugin
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args)
     {
-        Player player = (Player) sender;
-
         // help command
         if (command.getName().equalsIgnoreCase("simplemoderator"))
         {
@@ -108,7 +106,7 @@ public class SimpleMod extends JavaPlugin
                             Player banning = getServer().getPlayer(playerName);
                             if (banning != null) banning.kickPlayer("You have been banned!");
                             
-                            Logger.getLogger("minecraft").info(player.getName() + " banned player " + playerName + " for " + hours + " hours.");
+                            Logger.getLogger("minecraft").info(sender.getName() + " banned player " + playerName + " for " + hours + " hours.");
                         }
                         catch (NumberFormatException nfe)
                         {
@@ -128,7 +126,7 @@ public class SimpleMod extends JavaPlugin
                             Player banning = getServer().getPlayer(playerName);
                             if (banning != null) banning.kickPlayer("You have been banned!");
                             
-                            Logger.getLogger("minecraft").info(player.getName() + " banned player " + playerName);
+                            Logger.getLogger("minecraft").info(sender.getName() + " banned player " + playerName);
                         }
                         else
                             sender.sendMessage(ChatColor.RED + "You do not have permission to do that!");
@@ -159,7 +157,7 @@ public class SimpleMod extends JavaPlugin
                         smHandler.banIP(banning.getAddress().getHostString());
                         banning.kickPlayer("You have been banned!");
                         sender.sendMessage(ChatColor.GREEN + "Player '" + playerName + "' successfully IP banned!");
-                        Logger.getLogger("Minecraft").info(player.getName() + " IP banned player " + playerName + "(" + banning.getAddress().getHostString() + ")");
+                        Logger.getLogger("Minecraft").info(sender.getName() + " IP banned player " + playerName + "(" + banning.getAddress().getHostString() + ")");
                     }
                     else
                         sender.sendMessage(ChatColor.RED + "Error! Player not online, cannot ban their IP!");
@@ -184,7 +182,7 @@ public class SimpleMod extends JavaPlugin
                     if (smHandler.unBan(args[0]))
                     {
                         sender.sendMessage(ChatColor.GREEN + "Player '" + args[0] + "' unbanned!");
-                        Logger.getLogger("Minecraft").info(player.getName() + " unbanned player " + args[0]);
+                        Logger.getLogger("Minecraft").info(sender.getName() + " unbanned player " + args[0]);
                     }
                     else
                         sender.sendMessage(ChatColor.RED + "No player named '" + args[0] + "' is banned.");
@@ -217,7 +215,7 @@ public class SimpleMod extends JavaPlugin
                             int hours = Integer.parseInt(args[1]);
                             smHandler.mute(playerName, hours);
                             sender.sendMessage(ChatColor.GREEN + "Player '" + playerName + "' successfully muted for " + hours + " hours!");
-                            Logger.getLogger("minecraft").info(player.getName() + " muted player " + playerName + " for " + hours + " hours.");
+                            Logger.getLogger("minecraft").info(sender.getName() + " muted player " + playerName + " for " + hours + " hours.");
                         }
                         catch (NumberFormatException nfe)
                         {
@@ -232,7 +230,7 @@ public class SimpleMod extends JavaPlugin
                         {
                             smHandler.mute(playerName);
                             sender.sendMessage(ChatColor.GREEN + "Player '" + playerName + "' successfully muted!");
-                            Logger.getLogger("minecraft").info(player.getName() + " muted player " + playerName);
+                            Logger.getLogger("minecraft").info(sender.getName() + " muted player " + playerName);
                         }
                         else
                             sender.sendMessage(ChatColor.RED + "You do not have permission to do that!");
@@ -258,7 +256,7 @@ public class SimpleMod extends JavaPlugin
                     if (smHandler.unMute(args[0]))
                     {
                         sender.sendMessage(ChatColor.GREEN + "Player '" + args[0] + "' unmuted!");
-                        Logger.getLogger("Minecraft").info(player.getName() + " unmuted player " + args[0]);
+                        Logger.getLogger("Minecraft").info(sender.getName() + " unmuted player " + args[0]);
                     }
                     else
                         sender.sendMessage(ChatColor.RED + "No player named '" + args[0] + "' is muted.");
@@ -287,7 +285,7 @@ public class SimpleMod extends JavaPlugin
                     {
                         kicking.kickPlayer("You have been kicked!");
                         sender.sendMessage(ChatColor.GREEN + "Player '" + playerName + "' kicked!");
-                        Logger.getLogger("Minecraft").info(player.getName() + " kicked player " + playerName);
+                        Logger.getLogger("Minecraft").info(sender.getName() + " kicked player " + playerName);
                     }
                     else
                         sender.sendMessage(ChatColor.RED + "Error! Player not online, cannot kick!");
