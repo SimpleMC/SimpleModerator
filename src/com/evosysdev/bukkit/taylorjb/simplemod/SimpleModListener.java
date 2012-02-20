@@ -1,14 +1,14 @@
 package com.evosysdev.bukkit.taylorjb.simplemod;
 
-import java.util.logging.Logger;
-
 import org.bukkit.ChatColor;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerLoginEvent;
 
-public class SimpleModPlayerListener extends PlayerListener
+public class SimpleModListener implements Listener
 {
     private SimpleMod plugin; // instance of our plugin
     
@@ -18,9 +18,12 @@ public class SimpleModPlayerListener extends PlayerListener
      * @param plugin
      *            instance of our plugin
      */
-    public SimpleModPlayerListener(SimpleMod plugin)
+    public SimpleModListener(SimpleMod plugin)
     {
         this.plugin = plugin;
+
+        // register events
+        plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
     
     /**
@@ -30,13 +33,13 @@ public class SimpleModPlayerListener extends PlayerListener
      * @param login
      *            login event
      */
-    @Override
+    @EventHandler(priority = EventPriority.LOW)
     public void onPlayerLogin(PlayerLoginEvent login)
     {
         if (this.plugin.getHandler().isBanned(login.getPlayer().getName()))
         {
             login.disallow(PlayerLoginEvent.Result.KICK_BANNED, "You are banned!");
-            Logger.getLogger("minecraft").info("Player " + login.getPlayer().getName() + " denied entry: banned");
+            plugin.getLogger().info("Player " + login.getPlayer().getName() + " denied entry: banned");
         }
     }
     
@@ -47,13 +50,13 @@ public class SimpleModPlayerListener extends PlayerListener
      * @param join
      *            join event
      */
-    @Override
+    @EventHandler(priority = EventPriority.LOW)
     public void onPlayerJoin(PlayerJoinEvent join)
     {
         if (this.plugin.getHandler().isBanned(join.getPlayer().getName(), join.getPlayer().getAddress().getAddress().getHostAddress()))
         {
             join.getPlayer().kickPlayer("You are banned!");
-            Logger.getLogger("minecraft").info("Player " + join.getPlayer().getName() + " denied entry: banned");
+            plugin.getLogger().info("Player " + join.getPlayer().getName() + " denied entry: banned");
         }
     }
     
@@ -63,7 +66,7 @@ public class SimpleModPlayerListener extends PlayerListener
      * @param chat
      *            chat event
      */
-    @Override
+    @EventHandler(priority = EventPriority.LOW)
     public void onPlayerChat(PlayerChatEvent chat)
     {
         if (plugin.getHandler().isMuted(chat.getPlayer().getName()))
