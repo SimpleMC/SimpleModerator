@@ -6,23 +6,30 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.evosysdev.bukkit.taylorjb.simplemod.commands.SMKick;
+import com.evosysdev.bukkit.taylorjb.simplemod.commands.SMUnmute;
+
 public class SimpleMod extends JavaPlugin
 {
     private SimpleModHandler smHandler; // our moderation action handler
-
+    
     /**
      * Set up Permissions and set up listeners
      */
     public void onEnable()
     {
         smHandler = new SimpleModHandler(this);
-
+        
+        // set command executors
+        getCommand("kick").setExecutor(new SMKick(this));
+        getCommand("unmute").setExecutor(new SMUnmute(this, smHandler));
+        
         // create listener
         new SimpleModListener(this);
         
-        System.out.println(getDescription().getName() + " version " + getDescription().getVersion() + " enabled!");
+        getLogger().info(getDescription().getName() + " version " + getDescription().getVersion() + " enabled!");
     }
-
+    
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args)
     {
@@ -38,31 +45,31 @@ public class SimpleMod extends JavaPlugin
                     sender.sendMessage(ChatColor.AQUA + "/" + getCommand("ban").getName() + ChatColor.WHITE + " | " + ChatColor.BLUE
                             + getCommand("ban").getDescription());
                 }
-
+                
                 if (sender.hasPermission("simplemod.ipban"))
                 {
                     sender.sendMessage(ChatColor.AQUA + "/" + getCommand("banip").getName() + ChatColor.WHITE + " | " + ChatColor.BLUE
                             + getCommand("banip").getDescription());
                 }
-
+                
                 if (sender.hasPermission("simplemod.unban"))
                 {
                     sender.sendMessage(ChatColor.AQUA + "/" + getCommand("unban").getName() + ChatColor.WHITE + " | " + ChatColor.BLUE
                             + getCommand("unban").getDescription());
                 }
-
+                
                 if (sender.hasPermission("simplemod.mute") || sender.hasPermission("simplemod.mute.temp"))
                 {
                     sender.sendMessage(ChatColor.AQUA + "/" + getCommand("mute").getName() + ChatColor.WHITE + " | " + ChatColor.BLUE
                             + getCommand("mute").getDescription());
                 }
-
+                
                 if (sender.hasPermission("simplemod.unmute"))
                 {
                     sender.sendMessage(ChatColor.AQUA + "/" + getCommand("unmute").getName() + ChatColor.WHITE + " | " + ChatColor.BLUE
                             + getCommand("unmute").getDescription());
                 }
-
+                
                 if (sender.hasPermission("simplemod.kick"))
                 {
                     sender.sendMessage(ChatColor.AQUA + "/" + getCommand("kick").getName() + ChatColor.WHITE + " | " + ChatColor.BLUE
@@ -71,7 +78,7 @@ public class SimpleMod extends JavaPlugin
             }
             else
                 sender.sendMessage(ChatColor.RED + "You do not have permissions for that!");
-
+            
             return true;
         }
         else if (command.getName().equalsIgnoreCase("ban"))
@@ -82,7 +89,7 @@ public class SimpleMod extends JavaPlugin
                 if (args.length > 0)
                 {
                     String playerName = args[0];
-
+                    
                     // if there is a time arg
                     if (args.length > 1)
                     {
@@ -91,10 +98,11 @@ public class SimpleMod extends JavaPlugin
                             int hours = Integer.parseInt(args[1]);
                             smHandler.ban(playerName, hours);
                             sender.sendMessage(ChatColor.GREEN + "Player '" + playerName + "' successfully banned for " + hours + " hours!");
-
+                            
                             // if player is online, kick them
                             Player banning = getServer().getPlayer(playerName);
-                            if (banning != null) banning.kickPlayer("You have been banned!");
+                            if (banning != null)
+                                banning.kickPlayer("You have been banned!");
                             
                             getLogger().info(sender.getName() + " banned player " + playerName + " for " + hours + " hours.");
                         }
@@ -114,14 +122,15 @@ public class SimpleMod extends JavaPlugin
                             
                             // if player is online, kick them
                             Player banning = getServer().getPlayer(playerName);
-                            if (banning != null) banning.kickPlayer("You have been banned!");
+                            if (banning != null)
+                                banning.kickPlayer("You have been banned!");
                             
                             getLogger().info(sender.getName() + " banned player " + playerName);
                         }
                         else
                             sender.sendMessage(ChatColor.RED + "You do not have permission to do that!");
                     }
-
+                    
                     return true;
                 }
                 else
@@ -141,7 +150,7 @@ public class SimpleMod extends JavaPlugin
                 {
                     String playerName = args[0];
                     Player banning = getServer().getPlayer(playerName);
-
+                    
                     if (banning != null)
                     {
                         smHandler.banIP(banning.getAddress().getHostString());
@@ -196,7 +205,7 @@ public class SimpleMod extends JavaPlugin
                 if (args.length > 0)
                 {
                     String playerName = args[0];
-
+                    
                     // if there is a time arg
                     if (args.length > 1)
                     {
@@ -225,31 +234,6 @@ public class SimpleMod extends JavaPlugin
                         else
                             sender.sendMessage(ChatColor.RED + "You do not have permission to do that!");
                     }
-
-                    return true;
-                }
-                else
-                    return false;
-            }
-            else
-            {
-                sender.sendMessage(ChatColor.RED + "You do not have permission to do that!");
-                return true;
-            }
-        }
-        else if (command.getName().equalsIgnoreCase("unmute"))
-        {
-            if (sender.hasPermission("simplemod.unmute"))
-            {
-                if (args.length > 0)
-                {
-                    if (smHandler.unMute(args[0]))
-                    {
-                        sender.sendMessage(ChatColor.GREEN + "Player '" + args[0] + "' unmuted!");
-                        getLogger().info(sender.getName() + " unmuted player " + args[0]);
-                    }
-                    else
-                        sender.sendMessage(ChatColor.RED + "No player named '" + args[0] + "' is muted.");
                     
                     return true;
                 }
@@ -262,39 +246,10 @@ public class SimpleMod extends JavaPlugin
                 return true;
             }
         }
-        else if (command.getName().equalsIgnoreCase("kick"))
-        {
-            if (sender.hasPermission("simplemod.kick"))
-            {
-                if (args.length > 0)
-                {
-                    String playerName = args[0];
-                    Player kicking = getServer().getPlayer(playerName);
-
-                    if (kicking != null)
-                    {
-                        kicking.kickPlayer("You have been kicked!");
-                        sender.sendMessage(ChatColor.GREEN + "Player '" + playerName + "' kicked!");
-                        getLogger().info(sender.getName() + " kicked player " + playerName);
-                    }
-                    else
-                        sender.sendMessage(ChatColor.RED + "Error! Player not online, cannot kick!");
-                    
-                    return true;
-                }
-                else
-                    return false;
-            }
-            else
-            {
-                sender.sendMessage(ChatColor.RED + "You do not have permission to do that!");
-                return true;
-            }
-        }
-
+        
         return false;
     }
-
+    
     /**
      * plugin disabled
      */
@@ -302,7 +257,7 @@ public class SimpleMod extends JavaPlugin
     {
         getLogger().info("SimpleModerator disabled.");
     }
-
+    
     /**
      * Get our moderation handler
      * 
