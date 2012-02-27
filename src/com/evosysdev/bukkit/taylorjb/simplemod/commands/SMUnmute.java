@@ -9,6 +9,8 @@ import com.evosysdev.bukkit.taylorjb.simplemod.SimpleModHandler;
 
 public class SMUnmute extends SMCommand
 {
+    protected static String[] permissions = {"simplemod.unmute"};
+    
     /**
      * Initialize unmute command
      */
@@ -33,5 +35,4 @@ public class SMUnmute extends SMCommand
         
         return true;
     }
-    
 }

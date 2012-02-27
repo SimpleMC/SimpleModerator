@@ -11,12 +11,14 @@ import com.evosysdev.bukkit.taylorjb.simplemod.SimpleMod;
 
 public class SMKick extends SMCommand
 {
+    protected static final String[] permissions = {"simplemod.kick"};
+    
     /**
      * Initialize kick command
      */
     public SMKick(SimpleMod plugin)
     {
-        super(plugin, null, 1, "simplemod.kick");
+        super(plugin, null, 1, permissions);
     }
     
     @Override

@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * Handles all of the lists required for SimpleMod's moderator actions
  * 
- * @author TJ
+ * @author taylorjb
  * 
  */
 public class SimpleModHandler
@@ -40,8 +40,7 @@ public class SimpleModHandler
      */
     public void ban(String player)
     {
-        bans.put(player.toLowerCase(), new Long(-1));
-        save("bans", bansString());
+        ban(player, -1);
     }
     
     /**
@@ -54,7 +53,11 @@ public class SimpleModHandler
      */
     public void ban(String player, int hours)
     {
-        bans.put(player.toLowerCase(), System.currentTimeMillis() + (hours * 1000 * 60 * 60));
+        if (hours > 0)
+            bans.put(player.toLowerCase(), System.currentTimeMillis() + (hours * 1000 * 60 * 60));
+        else
+            bans.put(player.toLowerCase(), new Long(-1));
+        
         save("bans", bansString());
     }
     
@@ -103,6 +106,23 @@ public class SimpleModHandler
     {
         ipBans.add(host);
         save("ipbans", ipbansString());
+    }
+    
+    /**
+     * Unban host/IP
+     * 
+     * @param host
+     *            host to be unbanned
+     */
+    public boolean unBanIP(String host)
+    {
+        boolean success = ipBans.remove(host);
+        
+        // no need to save file if we didn't remove a host
+        if (success)
+            save("ipbans", ipbansString());
+        
+        return success;
     }
     
     /**
@@ -161,12 +181,12 @@ public class SimpleModHandler
     {
         player = player.toLowerCase();
         
-        if ((this.bans.containsKey(player)) || (this.ipBans.contains(hostString)))
+        if ((bans.containsKey(player)) || (this.ipBans.contains(hostString)))
         {
-            if ((this.bans.get(player) != null) && (((Long) this.bans.get(player)).longValue() != -1L) && (this.bans.containsKey(player))
-                    && (((Long) this.bans.get(player)).longValue() < System.currentTimeMillis()))
+            if ((bans.get(player) != null) && (((Long) bans.get(player)).longValue() != -1L) && (bans.containsKey(player))
+                    && (((Long) bans.get(player)).longValue() < System.currentTimeMillis()))
             {
-                this.bans.remove(player);
+                bans.remove(player);
                 save("bans", bansString());
             }
             else
@@ -186,10 +206,7 @@ public class SimpleModHandler
      */
     public void mute(String player)
     {
-        mutes.put(player.toLowerCase(), new Long(-1));
-        
-        if (this.persistMutes)
-            save("mutes", mutesString());
+        mute(player, -1);
     }
     
     /**
@@ -202,7 +219,10 @@ public class SimpleModHandler
      */
     public void mute(String player, int hours)
     {
-        mutes.put(player.toLowerCase(), System.currentTimeMillis() + (hours * 1000 * 60 * 60));
+        if (hours > 0)
+            mutes.put(player.toLowerCase(), System.currentTimeMillis() + (hours * 1000 * 60 * 60));
+        else
+            mutes.put(player.toLowerCase(), new Long(-1));
         
         if (this.persistMutes)
             save("mutes", mutesString());

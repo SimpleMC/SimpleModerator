@@ -8,6 +8,12 @@ import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 
+/**
+ * Listens to all events relevant to SimpleMod
+ * 
+ * @author taylorjb
+ *
+ */
 public class SimpleModListener implements Listener
 {
     private SimpleMod plugin; // instance of our plugin

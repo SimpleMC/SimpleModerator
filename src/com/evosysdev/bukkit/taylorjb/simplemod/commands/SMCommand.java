@@ -1,5 +1,7 @@
 package com.evosysdev.bukkit.taylorjb.simplemod.commands;
 
+import java.util.Arrays;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -11,7 +13,7 @@ import com.evosysdev.bukkit.taylorjb.simplemod.SimpleModHandler;
 /**
  * Abstract class for basic command requirements sans execution definition
  * 
- * @author TJ
+ * @author taylorjb
  * 
  */
 public abstract class SMCommand implements CommandExecutor
@@ -67,6 +69,19 @@ public abstract class SMCommand implements CommandExecutor
         }
         
         return execute(sender, command, label, args);
+    }
+    
+    /**
+     * @return String contains all strings on an array after certain index
+     */
+    protected String stringArrayToString(String[] array, int startIndex)
+    {
+        String rest = "";
+        
+        if (array.length > startIndex)
+            rest = Arrays.toString(Arrays.copyOfRange(array, startIndex, array.length)).replaceAll("[,\\[\\]]", "");
+        
+        return rest;
     }
     
     /**

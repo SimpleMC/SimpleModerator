@@ -1,6 +1,6 @@
 name: SimpleModerator
 main: com.evosysdev.bukkit.taylorjb.simplemod.SimpleMod
-version: 0.4.0
+version: 0.4.6
 website: http://dev.bukkit.org/server-mods/simplemoderator/
 author: taylorjb
 permissions:
@@ -11,23 +11,27 @@ permissions:
         children:
             simplemod: true
             simplemod.ban: true
-            simplemod.ban.temp: true
-            simplemod.ipban: true
             simplemod.unban: true
+            simplemod.ipban: true
+            simplemod.unbanip: true
             simplemod.mute: true
-            simplemod.mute.temp: true
             simplemod.unmute: true
             simplemod.kick: true
     simplemod.ban:
         description: Allows you to ban a user
+        children:
+            simplemod.ban.temp: true
     simplemod.ban.temp:
         description: Allows you to temporarily ban a user
-    simplemod.ipban:
-        description: Allows you to IP ban a user
     simplemod.unban:
         description: Allows you to unban a user
+    simplemod.ipban:
+        description: Allows you to IP ban a user
+    simplemod.unbanip:
+        description: Allows you to unban an IP address
     simplemod.mute:
-        description: Allows you to mute a user
+        children:
+            simplemod.mute.temp: true
     simplemod.mute.temp:
         description: Allows you to temporarily mute a user
     simplemod.unmute:
@@ -47,27 +51,45 @@ commands:
         aliases:
         description: Ban a player
         usage: |
-            /<command> <name> | Bans player with the given name
-            /<command> <name> <hours> | Bans player for given # of hours
-    banip:
+            /<command> <name> [reason] | Bans player with the given name=
+    tempban:
         aliases:
-            - ipban
-            - iban
-        description: Bans supplied player's IP address
-        usage:
-            /<command> <name> | Bans supplied player's IP address
+            - tban
+        description: Ban a player for some number of hours
+        usage: |
+            /<command> <name> <hours> [reason] | Bans player for given # of hours
     unban:
         aliases:
             - uban
         description: Unban a player
         usage: |
             /<command> <name> | Unbans player with the given name if they are banned
+    banip:
+        aliases:
+            - ipban
+            - iban
+        description: Bans supplied player's IP address
+        usage: |
+            /<command> <name> [reason] | Bans supplied player's IP address
+    unbanip:
+        aliases:
+            - uipban
+            - uiban
+            - ubanip
+        description: Bans supplied player's IP address
+        usage: |
+            /<command> <IP address> | Unbans specified IP address
     mute:
         aliases:
         description: Mute a player
         usage: |
-            /<command> <name> | Mutes player with the given name
-            /<command> <name> <hours> | Mutes player for given # of hours
+            /<command> <name> [reason] | Mutes player with the given name
+    tempmute:
+        aliases:
+            - tmute
+        description: Mute a player for some number of hours
+        usage: |
+            /<command> <name> <hours> [reason] | Mutes player for given # of hours
     unmute:
         aliases:
             - umute
@@ -77,4 +99,4 @@ commands:
     kick:
         description: Kick a player
         usage: |
-            /<command> <name> | Kicks player with given name
+            /<command> <name> [reason] | Kicks player with given name
