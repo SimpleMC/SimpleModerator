@@ -7,6 +7,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerLoginEvent.Result;
 
 /**
  * Listens to all events relevant to SimpleMod
@@ -42,27 +43,14 @@ public class SimpleModListener implements Listener
     @EventHandler(priority = EventPriority.LOW)
     public void onPlayerLogin(PlayerLoginEvent login)
     {
-        if (this.plugin.getHandler().isBanned(login.getPlayer().getName()))
+        // if result is allowed, kick message is the IP we want
+        if (login.getResult().equals(Result.ALLOWED))
         {
-            login.disallow(PlayerLoginEvent.Result.KICK_BANNED, "You are banned!");
-            plugin.getLogger().info("Player " + login.getPlayer().getName() + " denied entry: banned");
-        }
-    }
-    
-    /**
-     * Listen to player join event
-     * See if user should be IP banned
-     * 
-     * @param join
-     *            join event
-     */
-    @EventHandler(priority = EventPriority.LOW)
-    public void onPlayerJoin(PlayerJoinEvent join)
-    {
-        if (this.plugin.getHandler().isBanned(join.getPlayer().getName(), join.getPlayer().getAddress().getAddress().getHostAddress()))
-        {
-            join.getPlayer().kickPlayer("You are banned!");
-            plugin.getLogger().info("Player " + join.getPlayer().getName() + " denied entry: banned");
+            if (this.plugin.getHandler().isBanned(login.getPlayer().getName(), login.getKickMessage()))
+            {
+                login.disallow(Result.KICK_BANNED, "You are banned!");
+                plugin.getLogger().info("Player " + login.getPlayer().getName() + " denied entry: banned");
+            }
         }
     }
     
