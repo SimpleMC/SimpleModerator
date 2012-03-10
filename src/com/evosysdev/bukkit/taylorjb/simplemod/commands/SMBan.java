@@ -69,6 +69,10 @@ public class SMBan extends SMCommand
         // sender feedback
         sender.sendMessage(ChatColor.GREEN + "Player '" + banning + "'" + message.toString());
         
+        // broadcast message if we need to
+        if (handler.broadcastBan())
+            plugin.getServer().broadcastMessage(ChatColor.YELLOW + "Player '" + banning + "'" + message.toString());
+        
         // if player is online, kick him
         Player p = plugin.getServer().getPlayer(banning);
         if (p != null)

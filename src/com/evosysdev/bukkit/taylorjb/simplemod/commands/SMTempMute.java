@@ -9,7 +9,10 @@ import com.evosysdev.bukkit.taylorjb.simplemod.SimpleModHandler;
 
 public class SMTempMute extends SMMute
 {
-    protected static final String[] permissions = {"simplemod.mute.temp"};
+    protected static final String[] permissions =
+    {
+        "simplemod.mute.temp"
+    };
     
     /**
      * Initialize temp mute command
@@ -30,12 +33,12 @@ public class SMTempMute extends SMMute
         int hours = Integer.parseInt(args[1]);
         
         if (hours < 1)
-        {
             sender.sendMessage(ChatColor.RED + "Cannot temp mute indefinitely, use mute!");
-            return true;
-        }
+        else if (!handler.inMuteLimit(hours))
+            sender.sendMessage(ChatColor.RED + "You cannot mute for that long!");
+        else
+            mute(args[0], hours, sender, stringArrayToString(args, 2));
         
-        mute(args[0], hours, sender, stringArrayToString(args, 2));
         return true;
     }
 }

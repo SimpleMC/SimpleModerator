@@ -1,13 +1,12 @@
 package com.evosysdev.bukkit.taylorjb.simplemod.commands;
 
-import java.util.Arrays;
-
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.evosysdev.bukkit.taylorjb.simplemod.SimpleMod;
+import com.evosysdev.bukkit.taylorjb.simplemod.SimpleModHandler;
 
 public class SMKick extends SMCommand
 {
@@ -16,9 +15,9 @@ public class SMKick extends SMCommand
     /**
      * Initialize kick command
      */
-    public SMKick(SimpleMod plugin)
+    public SMKick(SimpleMod plugin, SimpleModHandler handler)
     {
-        super(plugin, null, 1, permissions);
+        super(plugin, handler, 1, permissions);
     }
     
     @Override
@@ -32,13 +31,23 @@ public class SMKick extends SMCommand
         
         if (kicking != null)
         {
+            String reason = stringArrayToString(args, 1),
+                    kickMessage = "You have been kicked!";
+            
             // if we have more args, treat as kick reason
-            if (args.length > 1)
-                kicking.kickPlayer("Kicked for: " + Arrays.toString(Arrays.copyOfRange(args, 1, args.length)).replaceAll("[,\\[\\]]", ""));
-            else
-                kicking.kickPlayer("You have been kicked!");
+            if (reason.length() > 0)
+                kickMessage += " Reason: " + reason;
+            
+            kicking.kickPlayer(kickMessage);
+            
+            // broadcast kick if we need to
+            if (handler.broadcastKick())
+            {
+                plugin.getServer().broadcastMessage(sender.getName() + " kicked player " + playerName + (reason.length() > 0 ? " for " + reason : ""));
+            }
+            
             sender.sendMessage(ChatColor.GREEN + "Player '" + playerName + "' kicked!");
-            plugin.getLogger().info(sender.getName() + " kicked player " + playerName);
+            plugin.getLogger().info(sender.getName() + " kicked player " + playerName + ", reason: " + reason);
         }
         else
             sender.sendMessage(ChatColor.RED + "Error! Player not online, cannot kick!");

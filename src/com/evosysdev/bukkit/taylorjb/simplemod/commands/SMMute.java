@@ -68,6 +68,10 @@ public class SMMute extends SMCommand
         
         // sender feedback
         sender.sendMessage(ChatColor.GREEN + "Player '" + muting + "'" + message.toString());
+
+        // broadcast message if we need to
+        if (handler.broadcastMute())
+            plugin.getServer().broadcastMessage(ChatColor.YELLOW + "Player '" + muting + "'" + message.toString());
         
         // if player is online, tell him he was muted
         Player p = plugin.getServer().getPlayer(muting);

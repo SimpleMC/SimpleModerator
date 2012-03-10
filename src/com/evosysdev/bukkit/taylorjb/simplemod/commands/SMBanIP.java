@@ -35,6 +35,11 @@ public class SMBanIP extends SMCommand
             
             if (args.length > 1)
                 reason = " for" + this.stringArrayToString(args, 1);
+
+
+            // broadcast message if we need to
+            if (handler.broadcastMute())
+                plugin.getServer().broadcastMessage(ChatColor.YELLOW + "Player '" + banning.getDisplayName() + "' IP banned" + reason);
             
             handler.banIP(banning.getAddress().getHostString());
             banning.kickPlayer("You have been banned" + reason + "!");

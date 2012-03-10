@@ -28,7 +28,7 @@ public class SimpleMod extends JavaPlugin
         getCommand("unban").setExecutor(new SMUnban(this, smHandler));
         getCommand("mute").setExecutor(new SMMute(this, smHandler));
         getCommand("tempmute").setExecutor(new SMTempMute(this, smHandler));
-        getCommand("kick").setExecutor(new SMKick(this));
+        getCommand("kick").setExecutor(new SMKick(this, smHandler));
         getCommand("unmute").setExecutor(new SMUnmute(this, smHandler));
         
         // create listener

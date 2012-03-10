@@ -9,7 +9,10 @@ import com.evosysdev.bukkit.taylorjb.simplemod.SimpleModHandler;
 
 public class SMTempBan extends SMBan
 {
-    protected static final String[] permissions = {"simplemod.ban.temp"};
+    protected static final String[] permissions =
+    {
+        "simplemod.ban.temp"
+    };
     
     /**
      * Initialize temp ban command
@@ -30,12 +33,12 @@ public class SMTempBan extends SMBan
         int hours = Integer.parseInt(args[1]);
         
         if (hours < 1)
-        {
             sender.sendMessage(ChatColor.RED + "Cannot temp ban indefinitely, use ban!");
-            return true;
-        }
+        else if (!handler.inBanLimit(hours))
+            sender.sendMessage(ChatColor.RED + "You cannot ban for that long!");
+        else
+            ban(args[0], hours, sender, stringArrayToString(args, 2));
         
-        ban(args[0], hours, sender, stringArrayToString(args, 2));
         return true;
     }
 }

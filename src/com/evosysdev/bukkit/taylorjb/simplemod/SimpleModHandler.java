@@ -6,6 +6,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.configuration.file.FileConfiguration;
+
 /**
  * Handles all of the lists required for SimpleMod's moderator actions
  * 
@@ -17,9 +19,13 @@ public class SimpleModHandler
     private Map<String, Long> bans, // currently banned players
             mutes; // currently muted players
     private List<String> ipBans; // currently banned IP addresses
+    private ConfigGen configGen; // configuration generator
     private SimpleMod instance; // instance of SimpleMod
-    private boolean persistMutes; // should mutes persist through logout
     
+    private boolean persistMutes, // should mutes persist through logout
+            broadcastKick, broadcastMute, broadcastBan; // server broadcasting options
+    private int muteLimit, banLimit; // max time for mute/ban
+            
     /**
      * Initialize the handler
      * 
@@ -29,7 +35,16 @@ public class SimpleModHandler
     public SimpleModHandler(SimpleMod instance)
     {
         this.instance = instance;
+        configGen = new ConfigGen(instance.getConfig());
         load();
+    }
+    
+    /**
+     * @return broadcast kick option
+     */
+    public boolean broadcastKick()
+    {
+        return broadcastKick;
     }
     
     /**
@@ -59,6 +74,22 @@ public class SimpleModHandler
             bans.put(player.toLowerCase(), new Long(-1));
         
         save("bans", bansString());
+    }
+    
+    /**
+     * @return if hours is within ban limit
+     */
+    public boolean inBanLimit(int hours)
+    {
+        return banLimit <= 0 || hours < banLimit;
+    }
+    
+    /**
+     * @return broadcast ban option
+     */
+    public boolean broadcastBan()
+    {
+        return broadcastBan;
     }
     
     /**
@@ -229,6 +260,22 @@ public class SimpleModHandler
     }
     
     /**
+     * @return if hours is within mute limit
+     */
+    public boolean inMuteLimit(int hours)
+    {
+        return muteLimit <= 0 || hours < muteLimit;
+    }
+    
+    /**
+     * @return broadcast mute option
+     */
+    public boolean broadcastMute()
+    {
+        return broadcastMute;
+    }
+    
+    /**
      * Unmute player
      * 
      * @param player
@@ -301,6 +348,8 @@ public class SimpleModHandler
         ipBans = new LinkedList<String>();
         mutes = new HashMap<String, Long>();
         persistMutes = false;
+        broadcastKick = broadcastMute = broadcastBan = false;
+        muteLimit = banLimit = 0;
         
         try
         {
@@ -324,13 +373,33 @@ public class SimpleModHandler
                 if (muteString.length() > 0)
                     decodeList(this.mutes, muteString.split(","));
             }
+            
+            // make sure broadcast path is in config
+            if (!instance.getConfig().contains("broadcast"))
+            {
+                configGen.genBroadcast();
+                instance.saveConfig();
+            }
+            
+            // load broadcast settings
+            broadcastKick = instance.getConfig().getBoolean("broadcast.kick");
+            broadcastMute = instance.getConfig().getBoolean("broadcast.mute");
+            broadcastBan = instance.getConfig().getBoolean("broadcast.ban");
+            
+            // make sure limit path is in config
+            if (!instance.getConfig().contains("limit"))
+            {
+                configGen.genLimit();
+                instance.saveConfig();
+            }
+            
+            // load limit settings
+            muteLimit = instance.getConfig().getInt("limit.mute");
+            banLimit = instance.getConfig().getInt("limit.ban");
         }
         catch (NullPointerException npe)
         { // config file couldn't be read
-            instance.getConfig().set("bans", "");
-            instance.getConfig().set("mutes", "");
-            instance.getConfig().set("persist-mutes", "false");
-            instance.getConfig().set("ipbans", "");
+            configGen.genConfig();
             instance.saveConfig();
         }
     }
@@ -366,5 +435,71 @@ public class SimpleModHandler
     {
         instance.getConfig().set(node, data);
         instance.saveConfig();
+    }
+}
+
+/**
+ * Lazy config generation class
+ * 
+ * @author taylorjb
+ *
+ */
+class ConfigGen
+{
+    // config sections
+    private static final Map<String, Object> broadcast, limit;
+    
+    static
+    {
+        broadcast = new HashMap<String, Object>();
+        broadcast.put("kick", false);
+        broadcast.put("mute", false);
+        broadcast.put("ban", false);
+
+        limit = new HashMap<String, Object>();
+        limit.put("mute", 168);
+        limit.put("ban", 168);
+    }
+    
+    FileConfiguration config; // our config file
+    
+    ConfigGen(FileConfiguration config)
+    {
+        this.config = config;
+    }
+    
+    void genConfig()
+    {
+        genLists();
+        genSettings();
+    }
+    
+    void genLists()
+    {
+        config.set("bans", "");
+        config.set("mutes", "");
+        config.set("ipbans", "");
+    }
+    
+    void genSettings()
+    {
+        genBroadcast();
+        genLimit();
+        genPersistMutes();
+    }
+    
+    void genBroadcast()
+    {
+        config.createSection("broadcast", broadcast);
+    }
+    
+    void genLimit()
+    {
+        config.createSection("limit", limit);
+    }
+    
+    void genPersistMutes()
+    {
+        config.set("persist-mutes", "false");
     }
 }
