@@ -1,6 +1,6 @@
 name: SimpleModerator
 main: com.evosysdev.bukkit.taylorjb.simplemod.SimpleMod
-version: 0.5.1_1
+version: 0.5.1_2
 website: http://dev.bukkit.org/server-mods/simplemoderator/
 author: taylorjb
 permissions:

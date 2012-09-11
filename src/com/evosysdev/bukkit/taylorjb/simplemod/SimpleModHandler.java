@@ -463,17 +463,27 @@ class ConfigGen
     
     FileConfiguration config; // our config file
     
+    /**
+     * Initialize ConfigGen with our file configuration
+     * @param config our file configuration
+     */
     ConfigGen(FileConfiguration config)
     {
         this.config = config;
     }
     
+    /**
+     * Generate config
+     */
     void genConfig()
     {
         genLists();
         genSettings();
     }
     
+    /**
+     * Insert list/data nodes
+     */
     void genLists()
     {
         config.set("bans", "");
@@ -481,6 +491,9 @@ class ConfigGen
         config.set("ipbans", "");
     }
     
+    /**
+     * Insert plugin setting nodes
+     */
     void genSettings()
     {
         genBroadcast();
@@ -488,16 +501,25 @@ class ConfigGen
         genPersistMutes();
     }
     
+    /**
+     * Insert broadcast setting node
+     */
     void genBroadcast()
     {
         config.createSection("broadcast", broadcast);
     }
-    
+
+    /**
+     * Insert limit setting node
+     */
     void genLimit()
     {
         config.createSection("limit", limit);
     }
-    
+
+    /**
+     * Insert mute persist setting node
+     */
     void genPersistMutes()
     {
         config.set("persist-mutes", "false");
