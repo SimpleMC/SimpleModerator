@@ -4,7 +4,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerChatEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 
@@ -60,7 +60,7 @@ public class SimpleModListener implements Listener
      *            chat event
      */
     @EventHandler(priority = EventPriority.LOW)
-    public void onPlayerChat(PlayerChatEvent chat)
+    public void onPlayerChat(AsyncPlayerChatEvent chat)
     {
         if (plugin.getHandler().isMuted(chat.getPlayer().getName()))
         {
