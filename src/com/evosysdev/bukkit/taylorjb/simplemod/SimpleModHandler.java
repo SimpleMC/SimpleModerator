@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -23,7 +24,8 @@ public class SimpleModHandler
     private SimpleMod instance; // instance of SimpleMod
     
     private boolean persistMutes, // should mutes persist through logout
-            broadcastKick, broadcastMute, broadcastBan; // server broadcasting options
+            broadcastKick, broadcastMute, broadcastBan; // server broadcasting
+                                                        // options
     private int muteLimit, banLimit; // max time for mute/ban
             
     /**
@@ -70,8 +72,7 @@ public class SimpleModHandler
     {
         if (hours > 0)
             bans.put(player.toLowerCase(), System.currentTimeMillis() + (hours * 1000 * 60 * 60));
-        else
-            bans.put(player.toLowerCase(), new Long(-1));
+        else bans.put(player.toLowerCase(), new Long(-1));
         
         save("bans", bansString());
     }
@@ -252,8 +253,7 @@ public class SimpleModHandler
     {
         if (hours > 0)
             mutes.put(player.toLowerCase(), System.currentTimeMillis() + (hours * 1000 * 60 * 60));
-        else
-            mutes.put(player.toLowerCase(), new Long(-1));
+        else mutes.put(player.toLowerCase(), new Long(-1));
         
         if (this.persistMutes)
             save("mutes", mutesString());
@@ -348,15 +348,22 @@ public class SimpleModHandler
         ipBans = new LinkedList<String>();
         mutes = new HashMap<String, Long>();
         persistMutes = false;
-        broadcastKick = broadcastMute = broadcastBan = false;
-        muteLimit = banLimit = 0;
+        broadcastKick = false;
+        broadcastMute = false;
+        broadcastBan = false;
+        muteLimit = 0;
+        banLimit = 0;
         
         try
         {
             // load bans
             String banString = instance.getConfig().getString("bans");
             if (banString.length() > 0)
-                decodeList(bans, banString.split(","));
+            {
+                // if we recovered an error here, set node
+                if (decodeList(bans, banString.split(",")))
+                    save("bans", bansString());
+            }
             
             // load IP bans
             String ipBanString = instance.getConfig().getString("ipbans");
@@ -371,7 +378,11 @@ public class SimpleModHandler
             {
                 String muteString = instance.getConfig().getString("mutes");
                 if (muteString.length() > 0)
-                    decodeList(this.mutes, muteString.split(","));
+                {
+                    // if we recovered an error here, set node
+                    if (decodeList(this.mutes, muteString.split(",")))
+                        save("mutes", mutesString());
+                }
             }
             
             // make sure broadcast path is in config
@@ -397,8 +408,12 @@ public class SimpleModHandler
             muteLimit = instance.getConfig().getInt("limit.mute");
             banLimit = instance.getConfig().getInt("limit.ban");
         }
+        // config file couldn't be read
         catch (NullPointerException npe)
-        { // config file couldn't be read
+        {
+            // generate new config
+            instance.getLogger().warning("Null when loading config, generating new config!");
+            instance.getLogger().log(Level.FINEST, "NPE when loading config.", npe);
             configGen.genConfig();
             instance.saveConfig();
         }
@@ -409,18 +424,47 @@ public class SimpleModHandler
      * Is there an easier way to do this?
      * 
      * @param map
+     *            map to insert into
      * @param list
+     *            list of strings to parse
+     * @return error recovered/must save
      */
-    public void decodeList(Map<String, Long> map, String[] list)
+    public boolean decodeList(Map<String, Long> map, String[] list)
     {
+        boolean recovered = false;
+        
         if (list.length > 0)
         {
             for (String s : list)
             {
                 String[] split = s.split(":");
-                map.put(split[0], Long.valueOf(split[1]));
+                
+                try
+                {
+                    // check for paired long value
+                    if (split.length < 2)
+                    {
+                        instance.getLogger().warning("Error in config! Missing expected numeric pair for \"" + s + "\"! Assuming -1...");
+                        split = new String[]
+                        { split[0], "-1" };
+                        recovered = true;
+                    }
+                    // too many values, indicate error
+                    else if (split.length > 2)
+                        instance.getLogger().warning("Error in config! Check file syntax around \"" + s + "\"!");
+                    
+                    // put parsed <String,Long>
+                    map.put(split[0], Long.valueOf(split[1]));
+                }
+                catch (NumberFormatException nfe)
+                {
+                    instance.getLogger().log(Level.WARNING, "Error reading config! Check syntax around \"" + s + "\".", nfe);
+                }
             }
         }
+        
+        // return if we recovered from an error
+        return recovered;
     }
     
     /**
@@ -442,7 +486,7 @@ public class SimpleModHandler
  * Lazy config generation class
  * 
  * @author taylorjb
- *
+ * 
  */
 class ConfigGen
 {
@@ -455,7 +499,7 @@ class ConfigGen
         broadcast.put("kick", false);
         broadcast.put("mute", false);
         broadcast.put("ban", false);
-
+        
         limit = new HashMap<String, Object>();
         limit.put("mute", 168);
         limit.put("ban", 168);
@@ -465,7 +509,9 @@ class ConfigGen
     
     /**
      * Initialize ConfigGen with our file configuration
-     * @param config our file configuration
+     * 
+     * @param config
+     *            our file configuration
      */
     ConfigGen(FileConfiguration config)
     {
@@ -508,7 +554,7 @@ class ConfigGen
     {
         config.createSection("broadcast", broadcast);
     }
-
+    
     /**
      * Insert limit setting node
      */
@@ -516,7 +562,7 @@ class ConfigGen
     {
         config.createSection("limit", limit);
     }
-
+    
     /**
      * Insert mute persist setting node
      */

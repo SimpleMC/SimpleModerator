@@ -1,6 +1,6 @@
 name: SimpleModerator
 main: com.evosysdev.bukkit.taylorjb.simplemod.SimpleMod
-version: 0.5.1_2
+version: 1.0.0
 website: http://dev.bukkit.org/server-mods/simplemoderator/
 author: taylorjb
 permissions:
@@ -71,6 +71,12 @@ commands:
         description: Bans supplied player's IP address
         usage: |
             /<command> <name> [reason] | Bans supplied player's IP address
+    banbyip:
+        aliases:
+            - banuserbyip
+        description: Bans supplied IP address
+        usage: |
+            /<command> <IP address> [reason] | Bans supplied IP address
     unbanip:
         aliases:
             - uipban

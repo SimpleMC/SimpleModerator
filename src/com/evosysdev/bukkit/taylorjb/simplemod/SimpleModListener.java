@@ -39,13 +39,13 @@ public class SimpleModListener implements Listener
      * @param login
      *            login event
      */
-    @EventHandler(priority = EventPriority.LOW)
+    @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerLogin(PlayerLoginEvent login)
     {
         // if result is allowed, kick message is the IP we want
         if (login.getResult().equals(Result.ALLOWED))
         {
-            if (this.plugin.getHandler().isBanned(login.getPlayer().getName(), login.getKickMessage()))
+            if (this.plugin.getHandler().isBanned(login.getPlayer().getName(), login.getAddress().getHostAddress()))
             {
                 login.disallow(Result.KICK_BANNED, "You are banned!");
                 plugin.getLogger().info("Player " + login.getPlayer().getName() + " denied entry: banned");
@@ -59,7 +59,7 @@ public class SimpleModListener implements Listener
      * @param chat
      *            chat event
      */
-    @EventHandler(priority = EventPriority.LOW)
+    @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerChat(AsyncPlayerChatEvent chat)
     {
         if (plugin.getHandler().isMuted(chat.getPlayer().getName()))
