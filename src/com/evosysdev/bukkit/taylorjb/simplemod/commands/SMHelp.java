@@ -25,6 +25,7 @@ public class SMHelp extends SMCommand
         commands.put(plugin.getCommand("tempban"), SMTempBan.permissions);
         commands.put(plugin.getCommand("unban"), SMUnban.permissions);
         commands.put(plugin.getCommand("banip"), SMBanIP.permissions);
+        commands.put(plugin.getCommand("banbyip"), SMBanIP.permissions);
         commands.put(plugin.getCommand("unbanip"), SMUnbanIP.permissions);
         commands.put(plugin.getCommand("mute"), SMMute.permissions);
         commands.put(plugin.getCommand("tempmute"), SMTempMute.permissions);
