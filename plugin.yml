@@ -1,6 +1,6 @@
 name: SimpleModerator
 main: com.evosysdev.bukkit.taylorjb.simplemod.SimpleMod
-version: 1.0.0
+version: 1.0.0_1
 website: http://dev.bukkit.org/server-mods/simplemoderator/
 author: taylorjb
 permissions:
@@ -51,7 +51,7 @@ commands:
         aliases:
         description: Ban a player
         usage: |
-            /<command> <name> [reason] | Bans player with the given name=
+            /<command> <name> [reason] | Bans player with the given name
     tempban:
         aliases:
             - tban

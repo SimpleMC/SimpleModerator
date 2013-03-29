@@ -52,7 +52,6 @@ public abstract class SMCommand implements CommandExecutor
         if (args.length < reqArgs)
         {
             sender.sendMessage(ChatColor.RED + "Command missing arguments! Usage:");
-            sender.sendMessage(ChatColor.GRAY + command.getUsage());
             return false;
         }
         
